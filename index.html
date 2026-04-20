@@ -961,20 +961,21 @@
     btn.textContent = 'Sending...';
 
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         buyer_name:  name,
         buyer_email: email,
         copies:      copies,
         to_email:    'jlr083091@gmail.com',
       });
+      console.log('EmailJS success:', result);
       showMsg('success', `✓ Order received! We'll be in touch at ${email}`);
       document.getElementById('buyer-name').value  = '';
       document.getElementById('buyer-email').value = '';
       qty = 1; qtyDisplay.value = 1;
       btn.textContent = 'Order Sent ✓';
     } catch (err) {
-      console.error(err);
-      showMsg('error', 'Something went wrong. Please try again or email jlr083091@gmail.com');
+      console.error('EmailJS error:', err);
+      showMsg('error', `Error: ${err.text || err.message || JSON.stringify(err)}`);
       btn.disabled = false;
       btn.textContent = 'Reserve Now';
     }
@@ -984,6 +985,8 @@
     const el = document.getElementById('form-message');
     el.className = `form-message ${type}`;
     el.textContent = text;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   // ── TRACKLIST ──
