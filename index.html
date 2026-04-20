@@ -467,6 +467,29 @@
     flex-shrink: 0;
     opacity: 0.7;
   }
+  .track-votes {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.1);
+    color: var(--light);
+    padding: 4px 10px;
+    border-radius: 3px;
+    min-width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .track-item:hover .track-votes {
+    background: rgba(201,147,26,0.3);
+    color: var(--gold);
+  }
+  .track-votes.has-voted {
+    background: rgba(201,147,26,0.5);
+    color: var(--gold);
+    font-weight: bold;
+  }
 
   /* ── FOOTER PROMO BAR ── */
   .promo-bar {
@@ -1006,30 +1029,48 @@
     { name: "Inferno",  dur: "", color: '--red'   },
   ];
 
+  // Load votes from localStorage
+  let votes = JSON.parse(localStorage.getItem('trackVotes')) || {};
+  tracks.forEach(t => {
+    if (!votes[t.name]) votes[t.name] = 0;
+  });
+
   const list = document.getElementById('tracklist');
   tracks.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'track-item';
     el.style.setProperty('--track-color', `var(${t.color})`);
-    el.querySelector = null; // unused
     el.innerHTML = `
       <span class="track-num">${String(i+1).padStart(2,'0')}</span>
       <div class="track-dot" style="background:var(${t.color})"></div>
       <span class="track-name">${t.name}</span>
       <span class="track-dur">${t.dur}</span>
+      <span class="track-votes">${votes[t.name]}</span>
     `;
-    // set the ::before color via inline style trick
     el.style.cssText += `--accent: var(${t.color})`;
-    const style = document.createElement('style');
-    // targeted hover bar
+    
+    // Hover effects
     el.addEventListener('mouseenter', () => {
       el.style.setProperty('border-left', `3px solid var(${t.color})`);
     });
     el.addEventListener('mouseleave', () => {
       el.style.removeProperty('border-left');
     });
+
+    // Double-click to vote
+    el.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      votes[t.name]++;
+      localStorage.setItem('trackVotes', JSON.stringify(votes));
+      const voteEl = el.querySelector('.track-votes');
+      voteEl.textContent = votes[t.name];
+      voteEl.classList.add('has-voted');
+      setTimeout(() => voteEl.classList.remove('has-voted'), 300);
+    });
+
     list.appendChild(el);
   });
+
 </script>
 </body>
 </html>
