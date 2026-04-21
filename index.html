@@ -556,12 +556,15 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .hero { grid-template-columns: 1fr; min-height: 100vh; overflow: visible; }
-    .color-strips { min-height: 100vh; height: auto; }
-    .right-panel { height: auto; min-height: 320px; flex: 1; }
-    .vinyl-wrapper { width: 260px; height: 260px; }
-    .left-panel { padding: 50px 30px; }
-    .album-title { font-size: 80px; }
+    .hero { grid-template-columns: 1fr; min-height: auto; height: auto; overflow: visible; }
+    .color-strips { min-height: auto; height: 100%; }
+    .right-panel { height: auto; min-height: 240px; flex: 1; }
+    .vinyl-wrapper { width: 200px; height: 200px; }
+    .left-panel { padding: 30px 20px; }
+    .label-tag { margin-bottom: 12px; }
+    .album-title { font-size: 60px; margin-bottom: 16px; }
+    .tagline { margin-bottom: 24px; font-size: 14px; }
+    .cta-row { margin-bottom: 24px; }
     .tracklist { grid-template-columns: 1fr; }
     .tracklist-section { padding: 50px 30px; }
     .promo-bar { flex-direction: column; gap: 16px; padding: 24px 30px; }
