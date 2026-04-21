@@ -309,20 +309,33 @@
     width: 10px; height: 10px;
     border-radius: 50%;
     background: var(--dark);
-    margin-top: 6px;
+    position: relative;
+    z-index: 2;
     border: 1px solid #444;
+  }
+  .vinyl-hole {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--dark);
+    position: relative;
+    z-index: 2;
+    border: 1px solid rgba(0,0,0,0.8);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
   }
 
   /* Tonearm */
   .tonearm {
     position: absolute;
-    top: -30px;
-    right: -50px;
-    width: 120px;
-    height: 200px;
+    top: -24px;
+    right: -28px;
+    width: 130px;
+    height: 210px;
     z-index: 20;
-    transform-origin: top right;
-    animation: armway 8s linear infinite;
+    /* SVG pivot: cx=85, cy=15 in 100x180 viewBox → rendered at 130x210 = 110.5px, 17.5px */
+    transform-origin: 110.5px 17.5px;
+    transform: rotate(-28deg);
+    animation: armway 8s ease-in-out infinite;
+    pointer-events: none;
   }
   .tonearm svg {
     width: 100%; height: 100%;
@@ -333,9 +346,9 @@
     to   { transform: rotate(360deg); }
   }
   @keyframes armway {
-    0%   { transform: rotate(-8deg); }
-    50%  { transform: rotate(-4deg); }
-    100% { transform: rotate(-8deg); }
+    0%   { transform: rotate(-28deg); }
+    50%  { transform: rotate(-24deg); }
+    100% { transform: rotate(-28deg); }
   }
 
   /* ── COLOR BLOCKS SECTION ── */
@@ -834,9 +847,8 @@
     <div class="accent-block ab7"></div>
 
     <div class="vinyl-wrapper">
-      <div class="vinyl-disc"></div>
-
-      <div class="vinyl-label">
+      <div class="vinyl-disc">
+        <div class="vinyl-label">
           <div class="vinyl-hole"></div>
         </div>
       </div>
