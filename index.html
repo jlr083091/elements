@@ -55,8 +55,10 @@
     left: 0; top: 0; bottom: 0;
     width: 6px;
     height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    z-index: 10;
   }
   .color-strips span {
     flex: 1;
@@ -554,9 +556,9 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .hero { grid-template-columns: 1fr; height: 100vh; overflow: visible; }
-    .color-strips { height: 100vh; }
-    .right-panel { height: 60vw; min-height: 320px; }
+    .hero { grid-template-columns: 1fr; min-height: 100vh; overflow: visible; }
+    .color-strips { min-height: 100vh; height: auto; }
+    .right-panel { height: auto; min-height: 320px; flex: 1; }
     .vinyl-wrapper { width: 260px; height: 260px; }
     .left-panel { padding: 50px 30px; }
     .album-title { font-size: 80px; }
