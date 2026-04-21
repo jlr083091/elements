@@ -334,7 +334,7 @@
     /* SVG pivot: cx=85, cy=15 in 100x180 viewBox → rendered at 130x210 = 110.5px, 17.5px */
     transform-origin: 110.5px 17.5px;
     transform: rotate(-28deg);
-    animation: armway 8s ease-in-out infinite;
+    animation: armway 16s ease-in-out infinite;
     pointer-events: none;
   }
   .tonearm svg {
@@ -347,8 +347,8 @@
   }
   @keyframes armway {
     0%   { transform: rotate(0deg); }
-    5%   { transform: rotate(-30deg); }
-    90%  { transform: rotate(-30deg); }
+    10%  { transform: rotate(-30deg); }
+    85%  { transform: rotate(-30deg); }
     100% { transform: rotate(0deg); }
   }
 
