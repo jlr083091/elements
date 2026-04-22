@@ -943,7 +943,7 @@
       <form id="vote-form" style="display: flex; flex-direction: column; gap: 16px;">
         <input type="text" id="voter-name" placeholder="Your Name" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
         <input type="email" id="voter-email" placeholder="Your Email" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
-        <select id="favorite-track" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
+        <select id="favorite-track" required style="padding: 12px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
           <option value="">Select Your Favorite Track</option>
         </select>
         <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Submit Vote</button>
@@ -1148,7 +1148,6 @@
         voter_name:     name,
         voter_email:    email,
         favorite_track: track,
-        reply_to:       email
       });
 
       messageEl.style.display = 'block';
