@@ -977,15 +977,24 @@
   // To activate email sending:
   // 1. Go to https://www.emailjs.com and create a free account
   // 2. Add an Email Service (Gmail works great) → copy your Service ID
-  // 3. Create an Email Template with these variables:
-  //    {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
+  // 3. Create TWO Email Templates:
+  //
+  //    TEMPLATE 1 (Pre-Order):
+  //    Variables: {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
   //    Subject: "New Vinyl Order — ELEMENTS"
-  // 4. Copy your Template ID and Public Key
-  // 5. Replace the three placeholder values below
+  //
+  //    TEMPLATE 2 (Vote):
+  //    Variables: {{voter_name}}, {{voter_email}}, {{favorite_track}}, {{to_email}}
+  //    Subject: "New Vote — Favorite Track"
+  //
+  // 4. Copy your Template IDs and Public Key
+  // 5. Replace EMAILJS_TEMPLATE_ID and EMAILJS_VOTE_TEMPLATE below
+  // 6. Replace your Service ID and Public Key
 
-  const EMAILJS_PUBLIC_KEY  = 'oBorwBKStAYGmVvVL';
-  const EMAILJS_SERVICE_ID  = 'service_sbu12g9';
-  const EMAILJS_TEMPLATE_ID = 'template_rvom68r';
+  const EMAILJS_PUBLIC_KEY     = 'oBorwBKStAYGmVvVL';
+  const EMAILJS_SERVICE_ID     = 'service_sbu12g9';
+  const EMAILJS_TEMPLATE_ID    = 'template_rvom68r';        // Pre-order template
+  const EMAILJS_VOTE_TEMPLATE  = 'template_txsfjkh';            // Vote template — replace with your template ID
 
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
@@ -1134,12 +1143,12 @@
     const messageEl = document.getElementById('vote-message');
 
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email:    'jlr083091@gmail.com',
-        voter_name: name,
-        voter_email: email,
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_VOTE_TEMPLATE, {
+        to_email:       'jlr083091@gmail.com',
+        voter_name:     name,
+        voter_email:    email,
         favorite_track: track,
-        reply_to: email
+        reply_to:       email
       });
 
       messageEl.style.display = 'block';
