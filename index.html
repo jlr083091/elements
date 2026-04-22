@@ -567,6 +567,7 @@
     .cta-row { margin-bottom: 24px; }
     .tracklist { grid-template-columns: 1fr; }
     .tracklist-section { padding: 50px 30px; }
+    .tracklist-section > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 40px !important; }
     .promo-bar { flex-direction: column; gap: 16px; padding: 24px 30px; }
     .credits { flex-direction: column; gap: 10px; padding: 24px 30px; text-align: center; }
     .elements-grid { grid-template-columns: repeat(7, 1fr); height: 60px; }
@@ -928,12 +929,27 @@
 <section class="tracklist-section">
   <div class="section-header">
     <span class="section-title">Tracklist</span>
-    <p>Double Click and Vote for your favorite track</p>
+    <p>Double Click and Vote for your favorite track • Enter for a chance to win a vinyl</p>
     <div class="section-line"></div>
   </div>
 
-  <div class="tracklist" id="tracklist">
-    <!-- Tracks injected by JS -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 60px;">
+    <div class="tracklist" id="tracklist">
+      <!-- Tracks injected by JS -->
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center;">
+      <h3 style="font-family: 'Bebas Neue'; font-size: 28px; letter-spacing: 2px; margin-bottom: 24px;">Enter to Win</h3>
+      <form id="vote-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <input type="text" id="voter-name" placeholder="Your Name" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
+        <input type="email" id="voter-email" placeholder="Your Email" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
+        <select id="favorite-track" required style="padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: var(--light); font-family: 'Barlow Condensed'; font-size: 13px; letter-spacing: 1px;">
+          <option value="">Select Your Favorite Track</option>
+        </select>
+        <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Submit Vote</button>
+      </form>
+      <div id="vote-message" style="margin-top: 16px; font-size: 13px; text-align: center; display: none;"></div>
+    </div>
   </div>
 </section>
 
@@ -1048,6 +1064,15 @@
     if (!votes[t.name]) votes[t.name] = 0;
   });
 
+  // Populate favorite track dropdown
+  const trackSelect = document.getElementById('favorite-track');
+  tracks.forEach(t => {
+    const option = document.createElement('option');
+    option.value = t.name;
+    option.textContent = t.name;
+    trackSelect.appendChild(option);
+  });
+
   const list = document.getElementById('tracklist');
   tracks.forEach((t, i) => {
     const el = document.createElement('div');
@@ -1079,9 +1104,41 @@
       voteEl.textContent = votes[t.name];
       voteEl.classList.add('has-voted');
       setTimeout(() => voteEl.classList.remove('has-voted'), 300);
+      // Auto-select in form
+      document.getElementById('favorite-track').value = t.name;
     });
 
     list.appendChild(el);
+  });
+
+  // Handle vote form submission
+  document.getElementById('vote-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('voter-name').value;
+    const email = document.getElementById('voter-email').value;
+    const track = document.getElementById('favorite-track').value;
+    const messageEl = document.getElementById('vote-message');
+
+    try {
+      await emailjs.send('service_hb0f7p1', 'template_u4tg4af', {
+        to_email:    'jlr083091@gmail.com',
+        voter_name: name,
+        voter_email: email,
+        favorite_track: track,
+        reply_to: email
+      });
+
+      messageEl.style.display = 'block';
+      messageEl.style.color = 'var(--green)';
+      messageEl.textContent = 'Vote submitted! You\'re entered to win.';
+      document.getElementById('vote-form').reset();
+      setTimeout(() => messageEl.style.display = 'none', 3000);
+    } catch (error) {
+      messageEl.style.display = 'block';
+      messageEl.style.color = 'var(--red)';
+      messageEl.textContent = 'Error submitting vote. Please try again.';
+    }
   });
 
 </script>
