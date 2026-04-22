@@ -929,7 +929,7 @@
 <section class="tracklist-section">
   <div class="section-header">
     <span class="section-title">Tracklist</span>
-    <p>Double Click and Vote for your favorite track • Enter for a chance to win a vinyl</p>
+    <p>Click your favorite track • Enter for a chance to win a vinyl</p>
     <div class="section-line"></div>
   </div>
 
@@ -1058,11 +1058,9 @@
     { name: "Inferno",  dur: "", color: '--red'   },
   ];
 
-  // Load votes from localStorage
+  // Load votes from localStorage - single vote system
   let votes = JSON.parse(localStorage.getItem('trackVotes')) || {};
-  tracks.forEach(t => {
-    if (!votes[t.name]) votes[t.name] = 0;
-  });
+  let currentVote = votes.currentVote || null;
 
   // Populate favorite track dropdown
   const trackSelect = document.getElementById('favorite-track');
@@ -1074,6 +1072,8 @@
   });
 
   const list = document.getElementById('tracklist');
+  let trackElements = {};
+
   tracks.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'track-item';
@@ -1083,9 +1083,10 @@
       <div class="track-dot" style="background:var(${t.color})"></div>
       <span class="track-name">${t.name}</span>
       <span class="track-dur">${t.dur}</span>
-      <span class="track-votes">${votes[t.name]}</span>
+      <span class="track-votes">${currentVote === t.name ? '⚡' : ''}</span>
     `;
     el.style.cssText += `--accent: var(${t.color})`;
+    trackElements[t.name] = el;
     
     // Hover effects
     el.addEventListener('mouseenter', () => {
@@ -1095,16 +1096,28 @@
       el.style.removeProperty('border-left');
     });
 
-    // Double-click to vote
-    el.addEventListener('dblclick', (e) => {
+    // Click to vote (single vote)
+    el.addEventListener('click', (e) => {
       e.preventDefault();
-      votes[t.name]++;
+      
+      // Remove previous vote
+      if (currentVote && trackElements[currentVote]) {
+        const prevVoteEl = trackElements[currentVote].querySelector('.track-votes');
+        prevVoteEl.textContent = '';
+        prevVoteEl.classList.remove('has-voted');
+      }
+      
+      // Set new vote
+      currentVote = t.name;
+      votes.currentVote = currentVote;
       localStorage.setItem('trackVotes', JSON.stringify(votes));
+      
       const voteEl = el.querySelector('.track-votes');
-      voteEl.textContent = votes[t.name];
+      voteEl.textContent = '⚡';
       voteEl.classList.add('has-voted');
       setTimeout(() => voteEl.classList.remove('has-voted'), 300);
-      // Auto-select in form
+      
+      // Update dropdown
       document.getElementById('favorite-track').value = t.name;
     });
 
@@ -1121,7 +1134,7 @@
     const messageEl = document.getElementById('vote-message');
 
     try {
-      await emailjs.send('service_hb0f7p1', 'template_u4tg4af', {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         to_email:    'jlr083091@gmail.com',
         voter_name: name,
         voter_email: email,
