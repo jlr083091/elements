@@ -912,46 +912,6 @@
   }
   .size-btn:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
 
-  /* Color swatches */
-  .color-options {
-    margin-bottom: 24px;
-  }
-  .color-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: rgba(255,255,255,0.4);
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 12px;
-  }
-  .color-swatches {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .color-swatch {
-    width: 44px;
-    height: 44px;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 2px solid rgba(255,255,255,0.1);
-    transition: all 0.2s;
-    position: relative;
-  }
-  .color-swatch:hover { border-color: rgba(255,255,255,0.4); transform: scale(1.05); }
-  .color-swatch.active {
-    border-color: var(--light);
-    box-shadow: 0 0 12px rgba(255,255,255,0.2);
-  }
-  .color-swatch[data-color="purple"] { background: var(--purple); }
-  .color-swatch[data-color="blue"] { background: var(--blue); }
-  .color-swatch[data-color="gold"] { background: var(--gold); }
-  .color-swatch[data-color="green"] { background: var(--green); }
-  .color-swatch[data-color="black"] { background: var(--charcoal); }
-  .color-swatch[data-color="white"] { background: var(--light); border-color: rgba(255,255,255,0.3); }
-  .color-swatch[data-color="red"] { background: var(--red); }
-
   .tshirts-form .submit-btn {
     width: 100%;
     padding: 18px;
@@ -1124,15 +1084,15 @@
 <!-- ══ TSHIRTS ══ -->
 <section class="tshirts-section" id="tshirts">
   <div class="tshirts-left">
-    <h2>Shop<br><span>T-Shirts</span></h2>
-    <p>Wear your elements. Premium cotton with bold ELEMENTS artwork available in seven signature colors.</p>
-    <div class="tshirt-badge">⬤ &nbsp; 100% Cotton</div>
-    <div class="tshirt-badge">⬤ &nbsp; 7 Colors Available</div>
+    <h2>Order<br>Your <span>T-Shirt</span></h2>
+    <p>Wear your elements. Premium cotton ELEMENTS T-shirt in washed black.</p>
+    <div class="tshirt-badge">⬭ &nbsp; 100% Cotton</div>
+    <div class="tshirt-badge">⬭ &nbsp; Black</div>
   </div>
 
   <div class="tshirts-form">
     <div class="form-title">Get Your Shirt</div>
-    <div class="form-subtitle">Choose size and color</div>
+    <div class="form-subtitle">ELEMENTS Black T-Shirt</div>
 
     <div class="field-group">
       <label class="field-label">Size</label>
@@ -1143,19 +1103,6 @@
         <button class="size-btn" data-size="L">L</button>
         <button class="size-btn" data-size="XL">XL</button>
         <button class="size-btn" data-size="2XL">2XL</button>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <label class="color-label">Color</label>
-      <div class="color-swatches">
-        <div class="color-swatch active" data-color="purple"></div>
-        <div class="color-swatch" data-color="blue"></div>
-        <div class="color-swatch" data-color="gold"></div>
-        <div class="color-swatch" data-color="green"></div>
-        <div class="color-swatch" data-color="black"></div>
-        <div class="color-swatch" data-color="white"></div>
-        <div class="color-swatch" data-color="red"></div>
       </div>
     </div>
 
@@ -1235,9 +1182,9 @@
   // To activate email sending:
   // 1. Go to https://www.emailjs.com and create a free account
   // 2. Add an Email Service (Gmail works great) → copy your Service ID
-  // 3. Create TWO Email Templates:
+  // 3. Create THREE Email Templates:
   //
-  //    TEMPLATE 1 (Pre-Order):
+  //    TEMPLATE 1 (Pre-Order Vinyl):
   //    Variables: {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
   //    Subject: "New Vinyl Order — ELEMENTS"
   //
@@ -1245,14 +1192,20 @@
   //    Variables: {{voter_name}}, {{voter_email}}, {{favorite_track}}, {{to_email}}
   //    Subject: "New Vote — Favorite Track"
   //
+  //    TEMPLATE 3 (T-Shirt Order):
+  //    Variables: {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
+  //    Subject: "New T-Shirt Order — ELEMENTS"
+  //    (copies format example: "2 × Black L")
+  //
   // 4. Copy your Template IDs and Public Key
-  // 5. Replace EMAILJS_TEMPLATE_ID and EMAILJS_VOTE_TEMPLATE below
+  // 5. Replace EMAILJS_TEMPLATE_ID, EMAILJS_VOTE_TEMPLATE, and EMAILJS_TSHIRT_TEMPLATE below
   // 6. Replace your Service ID and Public Key
 
-  const EMAILJS_PUBLIC_KEY     = 'oBorwBKStAYGmVvVL';
-  const EMAILJS_SERVICE_ID     = 'service_sbu12g9';
-  const EMAILJS_TEMPLATE_ID    = 'template_rvom68r';        // Pre-order template
-  const EMAILJS_VOTE_TEMPLATE  = 'template_txsfjkh';            // Vote template — replace with your template ID
+  const EMAILJS_PUBLIC_KEY        = 'oBorwBKStAYGmVvVL';
+  const EMAILJS_SERVICE_ID        = 'service_sbu12g9';
+  const EMAILJS_TEMPLATE_ID       = 'template_rvom68r';        // Pre-order vinyl template
+  const EMAILJS_VOTE_TEMPLATE     = 'template_txsfjkh';        // Vote template
+  const EMAILJS_TSHIRT_TEMPLATE   = 'template_rvom68r';        // T-shirt template — replace with your template ID
 
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
@@ -1422,7 +1375,6 @@
 
   // ── TSHIRTS FORM ──
   let tshirtSize = 'XS';
-  let tshirtColor = 'purple';
   let tshirtQty = 1;
 
   // Size buttons
@@ -1431,15 +1383,6 @@
       document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       tshirtSize = btn.dataset.size;
-    });
-  });
-
-  // Color swatches
-  document.querySelectorAll('.color-swatch').forEach(swatch => {
-    swatch.addEventListener('click', () => {
-      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-      swatch.classList.add('active');
-      tshirtColor = swatch.dataset.color;
     });
   });
 
@@ -1471,19 +1414,22 @@
 
     try {
       // Send tshirt order email
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TSHIRT_TEMPLATE, {
         buyer_name:  name,
         buyer_email: email,
-        copies:      `${tshirtQty} × ${tshirtColor.toUpperCase()} ${tshirtSize}`,
+        copies:      `${tshirtQty} × Black ${tshirtSize}`,
         to_email:    'jlr083091@gmail.com',
       });
       console.log('T-shirt order sent');
       document.getElementById('tshirt-form-message').className = 'form-message success';
-      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} shirt(s) in ${tshirtColor} ${tshirtSize} — confirmation sent to ${email}`;
+      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} shirt(s) in size ${tshirtSize} — confirmation sent to ${email}`;
       document.getElementById('tshirt-form-message').style.display = 'block';
       document.getElementById('tshirt-name').value  = '';
       document.getElementById('tshirt-email').value = '';
       tshirtQty = 1; document.getElementById('tshirt-qty-value').value = 1;
+      tshirtSize = 'XS'; 
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-size="XS"]').classList.add('active');
       btn.textContent = 'Order Sent ✓';
     } catch (err) {
       console.error('T-shirt order error:', err);
