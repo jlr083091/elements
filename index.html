@@ -793,6 +793,202 @@
     .preorder-form { padding: 30px 24px; }
   }
 
+  /* ── TSHIRTS SECTION ── */
+  .tshirts-section {
+    background: #0a0a0a;
+    padding: 100px 80px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .tshirts-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .tshirts-section::after {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 300px; height: 300px;
+    background: var(--purple);
+    opacity: 0.04;
+    transform: rotate(45deg);
+    border-radius: 40px;
+  }
+
+  .tshirts-left h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    letter-spacing: 4px;
+    line-height: 0.95;
+    color: var(--light);
+    margin-bottom: 20px;
+  }
+  .tshirts-left h2 span {
+    color: var(--purple);
+  }
+  .tshirts-left p {
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.8;
+    margin-bottom: 32px;
+    max-width: 360px;
+  }
+  .tshirt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(107,58,158,0.1);
+    border: 1px solid rgba(107,58,158,0.3);
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+    width: fit-content;
+  }
+  .tshirt-badge + .tshirt-badge { margin-top: 8px; }
+
+  /* ── TSHIRT FORM ── */
+  .tshirts-form {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 48px;
+    position: relative;
+    z-index: 2;
+  }
+  .tshirts-form .form-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--light);
+    margin-bottom: 8px;
+  }
+  .tshirts-form .form-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    margin-bottom: 36px;
+  }
+
+  /* Size selector */
+  .size-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .size-btn {
+    flex: 1;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .size-btn.active {
+    background: rgba(107,58,158,0.3);
+    border-color: var(--purple);
+    color: var(--light);
+  }
+  .size-btn:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+
+  /* Color swatches */
+  .color-options {
+    margin-bottom: 24px;
+  }
+  .color-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .color-swatches {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .color-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: all 0.2s;
+    position: relative;
+  }
+  .color-swatch:hover { border-color: rgba(255,255,255,0.4); transform: scale(1.05); }
+  .color-swatch.active {
+    border-color: var(--light);
+    box-shadow: 0 0 12px rgba(255,255,255,0.2);
+  }
+  .color-swatch[data-color="purple"] { background: var(--purple); }
+  .color-swatch[data-color="blue"] { background: var(--blue); }
+  .color-swatch[data-color="gold"] { background: var(--gold); }
+  .color-swatch[data-color="green"] { background: var(--green); }
+  .color-swatch[data-color="black"] { background: var(--charcoal); }
+  .color-swatch[data-color="white"] { background: var(--light); border-color: rgba(255,255,255,0.3); }
+  .color-swatch[data-color="red"] { background: var(--red); }
+
+  .tshirts-form .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--purple);
+    border: none;
+    color: var(--light);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tshirts-form .submit-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .tshirts-form .submit-btn:hover::after { transform: translateX(0); }
+  .tshirts-form .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107,58,158,0.3); }
+  .tshirts-form .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  @media (max-width: 768px) {
+    .tshirts-section {
+      grid-template-columns: 1fr;
+      padding: 60px 30px;
+      gap: 40px;
+    }
+    .tshirts-form { padding: 30px 24px; }
+    .size-options { gap: 8px; }
+    .size-btn { padding: 10px; font-size: 11px; }
+  }
+
   /* entry animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(30px); }
@@ -922,6 +1118,68 @@
 
     <button class="submit-btn" id="submit-btn">Reserve Now</button>
     <div class="form-message" id="form-message"></div>
+  </div>
+</section>
+
+<!-- ══ TSHIRTS ══ -->
+<section class="tshirts-section" id="tshirts">
+  <div class="tshirts-left">
+    <h2>Shop<br><span>T-Shirts</span></h2>
+    <p>Wear your elements. Premium cotton with bold ELEMENTS artwork available in seven signature colors.</p>
+    <div class="tshirt-badge">⬤ &nbsp; 100% Cotton</div>
+    <div class="tshirt-badge">⬤ &nbsp; 7 Colors Available</div>
+  </div>
+
+  <div class="tshirts-form">
+    <div class="form-title">Get Your Shirt</div>
+    <div class="form-subtitle">Choose size and color</div>
+
+    <div class="field-group">
+      <label class="field-label">Size</label>
+      <div class="size-options">
+        <button class="size-btn active" data-size="XS">XS</button>
+        <button class="size-btn" data-size="S">S</button>
+        <button class="size-btn" data-size="M">M</button>
+        <button class="size-btn" data-size="L">L</button>
+        <button class="size-btn" data-size="XL">XL</button>
+        <button class="size-btn" data-size="2XL">2XL</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="color-label">Color</label>
+      <div class="color-swatches">
+        <div class="color-swatch active" data-color="purple"></div>
+        <div class="color-swatch" data-color="blue"></div>
+        <div class="color-swatch" data-color="gold"></div>
+        <div class="color-swatch" data-color="green"></div>
+        <div class="color-swatch" data-color="black"></div>
+        <div class="color-swatch" data-color="white"></div>
+        <div class="color-swatch" data-color="red"></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="tshirt-name">Your Name</label>
+      <input class="field-input" type="text" id="tshirt-name" placeholder="Full name" autocomplete="name">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" for="tshirt-email">Email Address</label>
+      <input class="field-input" type="email" id="tshirt-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Quantity</label>
+      <div class="qty-row">
+        <button class="qty-btn" id="tshirt-qty-minus">−</button>
+        <input class="qty-display" type="number" id="tshirt-qty-value" value="1" min="1" max="10" readonly>
+        <button class="qty-btn" id="tshirt-qty-plus">+</button>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="tshirt-submit-btn">Add to Order</button>
+    <div class="form-message" id="tshirt-form-message"></div>
   </div>
 </section>
 
@@ -1159,6 +1417,81 @@
       messageEl.style.display = 'block';
       messageEl.style.color = 'var(--red)';
       messageEl.textContent = 'Error submitting vote. Please try again.';
+    }
+  });
+
+  // ── TSHIRTS FORM ──
+  let tshirtSize = 'XS';
+  let tshirtColor = 'purple';
+  let tshirtQty = 1;
+
+  // Size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tshirtSize = btn.dataset.size;
+    });
+  });
+
+  // Color swatches
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      swatch.classList.add('active');
+      tshirtColor = swatch.dataset.color;
+    });
+  });
+
+  // Quantity stepper for tshirts
+  document.getElementById('tshirt-qty-minus').addEventListener('click', () => {
+    if (tshirtQty > 1) { tshirtQty--; document.getElementById('tshirt-qty-value').value = tshirtQty; }
+  });
+  document.getElementById('tshirt-qty-plus').addEventListener('click', () => {
+    if (tshirtQty < 10) { tshirtQty++; document.getElementById('tshirt-qty-value').value = tshirtQty; }
+  });
+
+  // T-shirt form submit
+  document.getElementById('tshirt-submit-btn').addEventListener('click', async () => {
+    const name  = document.getElementById('tshirt-name').value.trim();
+    const email = document.getElementById('tshirt-email').value.trim();
+    const msgEl = document.getElementById('tshirt-form-message');
+    const btn   = document.getElementById('tshirt-submit-btn');
+
+    msgEl.className = 'form-message';
+    msgEl.style.display = 'none';
+
+    if (!name) { showMsg('error', 'Please enter your name.'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showMsg('error', 'Please enter a valid email address.'); return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    try {
+      // Send tshirt order email
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        buyer_name:  name,
+        buyer_email: email,
+        copies:      `${tshirtQty} × ${tshirtColor.toUpperCase()} ${tshirtSize}`,
+        to_email:    'jlr083091@gmail.com',
+      });
+      console.log('T-shirt order sent');
+      document.getElementById('tshirt-form-message').className = 'form-message success';
+      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} shirt(s) in ${tshirtColor} ${tshirtSize} — confirmation sent to ${email}`;
+      document.getElementById('tshirt-form-message').style.display = 'block';
+      document.getElementById('tshirt-name').value  = '';
+      document.getElementById('tshirt-email').value = '';
+      tshirtQty = 1; document.getElementById('tshirt-qty-value').value = 1;
+      btn.textContent = 'Order Sent ✓';
+    } catch (err) {
+      console.error('T-shirt order error:', err);
+      document.getElementById('tshirt-form-message').className = 'form-message error';
+      document.getElementById('tshirt-form-message').textContent = `Error: ${err.text || err.message || JSON.stringify(err)}`;
+      document.getElementById('tshirt-form-message').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Add to Order';
     }
   });
 
