@@ -949,6 +949,43 @@
     .size-btn { padding: 10px; font-size: 11px; }
   }
 
+  /* ── SHIRT IMAGES ── */
+  .tshirt-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .shirt-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .shirt-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .shirt-image-wrapper:hover .shirt-image {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  .shirt-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.6);
+    color: var(--light);
+    padding: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
   /* entry animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(30px); }
@@ -1088,6 +1125,17 @@
     <p>Wear your elements. Premium cotton ELEMENTS T-shirt in washed black.</p>
     <div class="tshirt-badge">⬭ &nbsp; 100% Cotton</div>
     <div class="tshirt-badge">⬭ &nbsp; Black</div>
+    
+    <div class="tshirt-images">
+      <div class="shirt-image-wrapper">
+        <img src="Front_Shirt.png" alt="ELEMENTS T-Shirt Front" class="shirt-image">
+        <div class="shirt-label">Front</div>
+      </div>
+      <div class="shirt-image-wrapper">
+        <img src="Back_Shirt.png" alt="ELEMENTS T-Shirt Back" class="shirt-image">
+        <div class="shirt-label">Back</div>
+      </div>
+    </div>
   </div>
 
   <div class="tshirts-form">
@@ -1185,17 +1233,18 @@
   // 3. Create THREE Email Templates:
   //
   //    TEMPLATE 1 (Pre-Order Vinyl):
-  //    Variables: {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
-  //    Subject: "New Vinyl Order — ELEMENTS"
+  //    Variables: {{buyer_name}}, {{buyer_email}}, {{product_type}}, {{copies}}, {{to_email}}
+  //    Subject: "New {{product_type}} Order — ELEMENTS"
+  //    Example copies: "2 × 180g Vinyl"
   //
   //    TEMPLATE 2 (Vote):
   //    Variables: {{voter_name}}, {{voter_email}}, {{favorite_track}}, {{to_email}}
   //    Subject: "New Vote — Favorite Track"
   //
   //    TEMPLATE 3 (T-Shirt Order):
-  //    Variables: {{buyer_name}}, {{buyer_email}}, {{copies}}, {{to_email}}
-  //    Subject: "New T-Shirt Order — ELEMENTS"
-  //    (copies format example: "2 × Black L")
+  //    Variables: {{buyer_name}}, {{buyer_email}}, {{product_type}}, {{copies}}, {{to_email}}
+  //    Subject: "New {{product_type}} Order — ELEMENTS"
+  //    Example copies: "2 × Black ELEMENTS T-Shirt (Size L)"
   //
   // 4. Copy your Template IDs and Public Key
   // 5. Replace EMAILJS_TEMPLATE_ID, EMAILJS_VOTE_TEMPLATE, and EMAILJS_TSHIRT_TEMPLATE below
@@ -1242,7 +1291,8 @@
       const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
         buyer_name:  name,
         buyer_email: email,
-        copies:      copies,
+        product_type: 'Vinyl',
+        copies:      copies + ' × 180g Vinyl',
         to_email:    'jlr083091@gmail.com',
       });
       console.log('EmailJS success:', result);
@@ -1417,7 +1467,8 @@
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TSHIRT_TEMPLATE, {
         buyer_name:  name,
         buyer_email: email,
-        copies:      `${tshirtQty} × Black ${tshirtSize}`,
+        product_type: 'T-Shirt',
+        copies:      `${tshirtQty} × Black ELEMENTS T-Shirt (Size ${tshirtSize})`,
         to_email:    'jlr083091@gmail.com',
       });
       console.log('T-shirt order sent');
