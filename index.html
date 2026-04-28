@@ -132,11 +132,16 @@
   }
 
   /* CTA buttons */
+  .cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 60px;
+  }
   .cta-row {
     display: flex;
     gap: 14px;
-    flex-wrap: wrap;
-    margin-bottom: 60px;
+    flex-wrap: nowrap;
   }
   .btn {
     font-family: 'Barlow Condensed', sans-serif;
@@ -1022,10 +1027,15 @@
     <div class="artist-name">James Ratcliff</div>
     <h1 class="album-title">ELEMENTS<span class="lightning">⚡</span></h1>
     <p class="tagline">Seven tracks. One vision. Electric guitar reimagined across every colour of sound.</p>
-    <div class="cta-row">
-      <a href="#preorder" class="btn btn-primary">Order Vinyl</a>
-      <a href="https://open.spotify.com/album/3OU2OYqqV1zHnosjHj9DMk" target="_blank" class="btn btn-ghost">Spotify</a>
-      <a href="https://music.apple.com/us/album/elements/1876996179" target="_blank" class="btn btn-ghost">Apple Music</a>
+    <div class="cta-stack">
+      <div class="cta-row">
+        <a href="#preorder" class="btn btn-primary">Order Vinyl</a>
+        <a href="#tshirts" class="btn btn-primary" style="background:var(--purple); color:var(--dark);">Order T-Shirt</a>
+      </div>
+      <div class="cta-row">
+        <a href="https://open.spotify.com/album/3OU2OYqqV1zHnosjHj9DMk" target="_blank" class="btn btn-ghost">Spotify</a>
+        <a href="https://music.apple.com/us/album/elements/1876996179" target="_blank" class="btn btn-ghost">Apple Music</a>
+      </div>
     </div>
     <div class="swatch-row">
       <div class="swatch" style="background:var(--purple)"></div>
@@ -1317,6 +1327,14 @@
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  function showTshirtMsg(type, text) {
+    const el = document.getElementById('tshirt-form-message');
+    el.className = `form-message ${type}`;
+    el.textContent = text;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
   // ── TRACKLIST ──
   const tracks = [
     { name: "Eclipse",  dur: "", color: '--purple' },
@@ -1454,9 +1472,9 @@
     msgEl.className = 'form-message';
     msgEl.style.display = 'none';
 
-    if (!name) { showMsg('error', 'Please enter your name.'); return; }
+    if (!name) { showTshirtMsg('error', 'Please enter your name.'); return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showMsg('error', 'Please enter a valid email address.'); return;
+      showTshirtMsg('error', 'Please enter a valid email address.'); return;
     }
 
     btn.disabled = true;
