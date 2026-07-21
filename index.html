@@ -915,7 +915,14 @@
     border-color: var(--purple);
     color: var(--light);
   }
-  .size-btn:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+  .size-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.35);
+  }
+  .size-btn:hover:not(.active):not(:disabled) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
 
   .tshirts-form .submit-btn {
     width: 100%;
@@ -989,6 +996,53 @@
     letter-spacing: 2px;
     text-align: center;
     text-transform: uppercase;
+  }
+
+  /* ── MEDIA PLAYER SECTION ── */
+  .media-player-section {
+    background: linear-gradient(135deg, rgba(107,58,158,0.16), rgba(46,95,163,0.12));
+    padding: 80px 40px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .media-player-card {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .media-player-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .media-player-card h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 4vw, 48px);
+    letter-spacing: 2px;
+    color: var(--light);
+    margin-bottom: 12px;
+  }
+  .media-player-card p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 24px;
+    max-width: 620px;
+  }
+  .audio-player {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .audio-player audio {
+    width: 100%;
   }
 
   /* entry animations */
@@ -1091,6 +1145,19 @@
   <div class="element-block" style="background:var(--red)">Inferno</div>
 </div>
 
+<!-- ══ COVER SONG PLAYER ══ -->
+<section class="media-player-section" id="cover-song">
+  <div class="media-player-card">
+    <div class="media-player-label">Cover Song</div>
+    <h2>Risk It All — Boss JR</h2>
+    <p>Listen to my cover of Risk It All by RATCLIFF.</p>
+    <audio class="audio-player" controls preload="metadata">
+      <source src="audio/cover-song.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+</section>
+
 <!-- ══ PRE-ORDER VINYL ══ -->
 <section class="preorder-section" id="preorder">
   <div class="preorder-left">
@@ -1155,12 +1222,12 @@
     <div class="field-group">
       <label class="field-label">Size</label>
       <div class="size-options">
-        <button class="size-btn active" data-size="XS">XS</button>
-        <button class="size-btn" data-size="S">S</button>
-        <button class="size-btn" data-size="M">M</button>
-        <button class="size-btn" data-size="L">L</button>
-        <button class="size-btn" data-size="XL">XL</button>
-        <button class="size-btn" data-size="2XL">2XL</button>
+        <button class="size-btn" data-size="XS" disabled>XS<br><span>Sold Out</span></button>
+        <button class="size-btn" data-size="S" disabled>S<br><span>Sold Out</span></button>
+        <button class="size-btn" data-size="M" disabled>M<br><span>Sold Out</span></button>
+        <button class="size-btn active" data-size="L">L<br><span>4 Left</span></button>
+        <button class="size-btn" data-size="XL" disabled>XL<br><span>Sold Out</span></button>
+        <button class="size-btn" data-size="2XL" disabled>2XL<br><span>Sold Out</span></button>
       </div>
     </div>
 
@@ -1442,15 +1509,45 @@
   });
 
   // ── TSHIRTS FORM ──
-  let tshirtSize = 'XS';
+  let tshirtSize = 'L';
   let tshirtQty = 1;
+  const shirtInventory = { XS: 0, S: 0, M: 0, L: 4, XL: 0, '2XL': 0 };
+  const sizeButtons = Array.from(document.querySelectorAll('.size-btn'));
+
+  function updateSizeButtons() {
+    sizeButtons.forEach(btn => {
+      const size = btn.dataset.size;
+      const remaining = shirtInventory[size] || 0;
+      const countLabel = btn.querySelector('span');
+
+      if (remaining > 0) {
+        btn.disabled = false;
+        if (countLabel) countLabel.textContent = `${remaining} Left`;
+      } else {
+        btn.disabled = true;
+        if (countLabel) countLabel.textContent = 'Sold Out';
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  function setActiveSize(size) {
+    const btn = sizeButtons.find(b => b.dataset.size === size);
+    if (!btn || btn.disabled) return;
+
+    sizeButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tshirtSize = size;
+  }
+
+  updateSizeButtons();
+  setActiveSize('L');
 
   // Size buttons
-  document.querySelectorAll('.size-btn').forEach(btn => {
+  sizeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      tshirtSize = btn.dataset.size;
+      if (btn.disabled) return;
+      setActiveSize(btn.dataset.size);
     });
   });
 
@@ -1490,15 +1587,23 @@
         to_email:    'jlr083091@gmail.com',
       });
       console.log('T-shirt order sent');
+      const remainingAfterOrder = Math.max(0, (shirtInventory[tshirtSize] || 0) - tshirtQty);
+      shirtInventory[tshirtSize] = remainingAfterOrder;
+      updateSizeButtons();
+
+      if (shirtInventory[tshirtSize] > 0) {
+        setActiveSize(tshirtSize);
+      } else {
+        const fallback = sizeButtons.find(b => !b.disabled);
+        if (fallback) setActiveSize(fallback.dataset.size);
+      }
+
       document.getElementById('tshirt-form-message').className = 'form-message success';
       document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} shirt(s) in size ${tshirtSize} — confirmation sent to ${email}`;
       document.getElementById('tshirt-form-message').style.display = 'block';
       document.getElementById('tshirt-name').value  = '';
       document.getElementById('tshirt-email').value = '';
       tshirtQty = 1; document.getElementById('tshirt-qty-value').value = 1;
-      tshirtSize = 'XS'; 
-      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('[data-size="XS"]').classList.add('active');
       btn.textContent = 'Order Sent ✓';
     } catch (err) {
       console.error('T-shirt order error:', err);
