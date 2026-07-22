@@ -1037,6 +1037,21 @@
     margin-bottom: 24px;
     max-width: 620px;
   }
+  .play-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: rgba(201,147,26,0.16);
+    border: 1px solid rgba(201,147,26,0.3);
+    border-radius: 999px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
   .audio-player {
     width: 100%;
     margin-top: 8px;
@@ -1151,7 +1166,8 @@
     <div class="media-player-label">Cover Song</div>
     <h2>Risk It All — Boss JR</h2>
     <p>Listen to my cover of Risk It All by RATCLIFF.</p>
-    <audio class="audio-player" controls preload="metadata">
+    <div class="play-count" id="play-count">Plays: 0</div>
+    <audio class="audio-player" id="cover-audio" controls preload="metadata">
       <source src="audio/cover-song.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
     </audio>
@@ -1507,6 +1523,55 @@
       messageEl.textContent = 'Error submitting vote. Please try again.';
     }
   });
+
+  // ── COVER SONG PLAY COUNTER ──
+  const playCountEl = document.getElementById('play-count');
+  const coverAudio = document.getElementById('cover-audio');
+  const playCountStorageKey = 'risk-it-all-plays';
+
+  function getStoredPlayCount() {
+    const stored = Number(localStorage.getItem(playCountStorageKey));
+    return Number.isFinite(stored) && stored >= 0 ? stored : 0;
+  }
+
+  function setPlayCount(count) {
+    playCountEl.textContent = `Plays: ${count}`;
+    localStorage.setItem(playCountStorageKey, String(count));
+  }
+
+  async function updatePlayCount() {
+    try {
+      const res = await fetch('/api/play-count');
+      if (res.ok) {
+        const data = await res.json();
+        setPlayCount(data.count);
+        return;
+      }
+    } catch (err) {
+      console.warn('Server counter unavailable, using local fallback', err);
+    }
+
+    setPlayCount(getStoredPlayCount());
+  }
+
+  async function incrementPlayCount() {
+    try {
+      const res = await fetch('/api/play-count/increment', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        setPlayCount(data.count);
+        return;
+      }
+    } catch (err) {
+      console.warn('Server counter unavailable, using local fallback', err);
+    }
+
+    const nextCount = getStoredPlayCount() + 1;
+    setPlayCount(nextCount);
+  }
+
+  updatePlayCount();
+  coverAudio.addEventListener('play', incrementPlayCount);
 
   // ── TSHIRTS FORM ──
   let tshirtSize = 'L';

@@ -1,0 +1,11 @@
+{
+  "name": "elements-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.13.0"
+  }
+}
