@@ -844,6 +844,9 @@
   .tshirts-left h2 span {
     color: var(--purple);
   }
+  .tshirts-left h2 span.true-north-theme {
+    color: #c8aa4a;
+  }
   .tshirts-left p {
     font-size: 15px;
     font-weight: 300;
@@ -868,6 +871,11 @@
     margin-bottom: 12px;
     display: block;
     width: fit-content;
+  }
+  .tshirt-badge.true-north-theme {
+    background: rgba(184, 134, 11, 0.15);
+    border-color: #c8aa4a;
+    color: #e9d18a;
   }
   .tshirt-badge + .tshirt-badge { margin-top: 8px; }
 
@@ -895,12 +903,14 @@
     margin-bottom: 36px;
   }
 
-  /* Size selector */
+  /* Style and size selectors */
+  .style-options,
   .size-options {
     display: flex;
     gap: 12px;
     margin-bottom: 24px;
   }
+  .style-btn,
   .size-btn {
     flex: 1;
     padding: 12px;
@@ -919,6 +929,31 @@
     border-color: var(--purple);
     color: var(--light);
   }
+  .size-btn.true-north-theme {
+    background: rgba(184, 134, 11, 0.25);
+    border-color: #c8aa4a;
+    color: var(--light);
+  }
+  .size-btn.active.true-north-theme {
+    background: rgba(184, 134, 11, 0.25);
+    border-color: #c8aa4a;
+    color: var(--light);
+  }
+  .size-btn.strikethrough {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .style-btn.active {
+    background: rgba(107,58,158,0.3);
+    border-color: var(--purple);
+    color: var(--light);
+  }
+  .style-btn.active[data-style="True North"] {
+    background: rgba(184, 134, 11, 0.25);
+    border-color: #c8aa4a;
+    color: var(--light);
+  }
+  .style-btn:disabled,
   .size-btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
@@ -926,6 +961,7 @@
     border-color: rgba(255,255,255,0.06);
     color: rgba(255,255,255,0.35);
   }
+  .style-btn:hover:not(.active):not(:disabled),
   .size-btn:hover:not(.active):not(:disabled) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
 
   .tshirts-form .submit-btn {
@@ -942,6 +978,10 @@
     margin-top: 32px;
     position: relative;
     overflow: hidden;
+  }
+  .tshirts-form .submit-btn.true-north-theme {
+    background: #c8aa4a;
+    box-shadow: 0 8px 24px rgba(184, 134, 11, 0.25);
   }
   .tshirts-form .submit-btn::after {
     content: '';
@@ -988,6 +1028,18 @@
   .shirt-image-wrapper:hover .shirt-image {
     transform: scale(1.05);
     opacity: 0.9;
+  }
+  .shirt-preview-item {
+    display: none;
+    visibility: hidden;
+  }
+  .shirt-preview-item.active {
+    display: block;
+    visibility: visible;
+  }
+  .shirt-preview-item[data-style="True North"] {
+    display: block;
+    visibility: visible;
   }
   .shirt-label {
     position: absolute;
@@ -1233,14 +1285,22 @@
     <div class="tshirt-badge">⬭ &nbsp; 100% Cotton</div>
     <div class="tshirt-badge">⬭ &nbsp; Black</div>
     
-    <div class="tshirt-images">
-      <div class="shirt-image-wrapper">
-        <img src="Front_Shirt.png" alt="ELEMENTS T-Shirt Front" class="shirt-image">
-        <div class="shirt-label">Front</div>
+    <div class="tshirt-images" id="shirt-preview-images">
+      <div class="shirt-image-wrapper shirt-preview-item" data-style="OG">
+        <img src="Front_Shirt.png" alt="OG T-Shirt Front" class="shirt-image">
+        <div class="shirt-label">OG Front</div>
       </div>
-      <div class="shirt-image-wrapper">
-        <img src="Back_Shirt.png" alt="ELEMENTS T-Shirt Back" class="shirt-image">
-        <div class="shirt-label">Back</div>
+      <div class="shirt-image-wrapper shirt-preview-item" data-style="OG">
+        <img src="Back_Shirt.png" alt="OG T-Shirt Back" class="shirt-image">
+        <div class="shirt-label">OG Back</div>
+      </div>
+      <div class="shirt-image-wrapper shirt-preview-item active" data-style="True North">
+        <img src="North_Front.png" alt="True North T-Shirt Front" class="shirt-image">
+        <div class="shirt-label">True North Front</div>
+      </div>
+      <div class="shirt-image-wrapper shirt-preview-item active" data-style="True North">
+        <img src="North_Back.png" alt="True North T-Shirt Back" class="shirt-image">
+        <div class="shirt-label">True North Back</div>
       </div>
     </div>
   </div>
@@ -1250,14 +1310,22 @@
     <div class="form-subtitle">ELEMENTS Black T-Shirt</div>
 
     <div class="field-group">
+      <label class="field-label">Style</label>
+      <div class="style-options">
+        <button type="button" class="style-btn" data-style="OG">OG<br><span>Available</span></button>
+        <button type="button" class="style-btn active" data-style="True North">True North<br><span>Available</span></button>
+      </div>
+    </div>
+
+    <div class="field-group">
       <label class="field-label">Size</label>
       <div class="size-options">
-        <button class="size-btn" data-size="XS" disabled>XS<br><span>Sold Out</span></button>
-        <button class="size-btn" data-size="S" disabled>S<br><span>Sold Out</span></button>
-        <button class="size-btn" data-size="M" disabled>M<br><span>Sold Out</span></button>
-        <button class="size-btn active" data-size="L">L<br><span>4 Left</span></button>
-        <button class="size-btn" data-size="XL" disabled>XL<br><span>Sold Out</span></button>
-        <button class="size-btn" data-size="2XL" disabled>2XL<br><span>Sold Out</span></button>
+        <button type="button" class="size-btn" data-size="XS" disabled>XS<br><span>Sold Out</span></button>
+        <button type="button" class="size-btn" data-size="S" disabled>S<br><span>Sold Out</span></button>
+        <button type="button" class="size-btn" data-size="M" disabled>M<br><span>Sold Out</span></button>
+        <button type="button" class="size-btn active" data-size="L">L<br><span>4 Left</span></button>
+        <button type="button" class="size-btn" data-size="XL" disabled>XL<br><span>Sold Out</span></button>
+        <button type="button" class="size-btn" data-size="2XL" disabled>2XL<br><span>Sold Out</span></button>
       </div>
     </div>
 
@@ -1274,13 +1342,13 @@
     <div class="field-group">
       <label class="field-label">Quantity</label>
       <div class="qty-row">
-        <button class="qty-btn" id="tshirt-qty-minus">−</button>
+        <button type="button" class="qty-btn" id="tshirt-qty-minus">−</button>
         <input class="qty-display" type="number" id="tshirt-qty-value" value="1" min="1" max="10" readonly>
-        <button class="qty-btn" id="tshirt-qty-plus">+</button>
+        <button type="button" class="qty-btn" id="tshirt-qty-plus">+</button>
       </div>
     </div>
 
-    <button class="submit-btn" id="tshirt-submit-btn">Reserve Now</button>
+    <button type="button" class="submit-btn" id="tshirt-submit-btn">Reserve Now</button>
     <div class="form-message" id="tshirt-form-message"></div>
   </div>
 </section>
@@ -1615,14 +1683,30 @@
   // ── TSHIRTS FORM ──
   let tshirtSize = 'L';
   let tshirtQty = 1;
-  const shirtInventory = { XS: 0, S: 0, M: 0, L: 4, XL: 0, '2XL': 0 };
+  let tshirtStyle = 'True North';
+  const shirtInventory = {
+    OG: { XS: 0, S: 0, M: 0, L: 4, XL: 0, '2XL': 0 },
+    'True North': { XS: 0, S: 0, M: 2, L: 4, XL: 3, '2XL': 0 }
+  };
   const sizeButtons = Array.from(document.querySelectorAll('.size-btn'));
+  const styleButtons = Array.from(document.querySelectorAll('.style-btn'));
+  const previewItems = Array.from(document.querySelectorAll('.shirt-preview-item'));
 
   function updateSizeButtons() {
     sizeButtons.forEach(btn => {
       const size = btn.dataset.size;
-      const remaining = shirtInventory[size] || 0;
+      const remaining = shirtInventory[tshirtStyle][size] || 0;
       const countLabel = btn.querySelector('span');
+
+      if (tshirtStyle === 'True North') {
+        const unavailableSizes = ['XS', 'S', '2XL'];
+        const isUnavailable = unavailableSizes.includes(size);
+        btn.classList.toggle('strikethrough', isUnavailable);
+        btn.disabled = !isUnavailable ? false : true;
+        if (countLabel) countLabel.textContent = isUnavailable ? '' : '';
+        btn.classList.remove('active');
+        return;
+      }
 
       if (remaining > 0) {
         btn.disabled = false;
@@ -1635,24 +1719,72 @@
     });
   }
 
+  function getFirstAvailableSize(style) {
+    return ['XS', 'S', 'M', 'L', 'XL', '2XL'].find(size => (shirtInventory[style][size] || 0) > 0) || 'L';
+  }
+
   function setActiveSize(size) {
     const btn = sizeButtons.find(b => b.dataset.size === size);
     if (!btn || btn.disabled) return;
 
-    sizeButtons.forEach(b => b.classList.remove('active'));
+    sizeButtons.forEach(b => {
+      b.classList.remove('active');
+      b.classList.remove('true-north-theme');
+    });
     btn.classList.add('active');
+    if (tshirtStyle === 'True North') {
+      btn.classList.add('true-north-theme');
+    }
     tshirtSize = size;
   }
 
+  function setActiveStyle(style) {
+    const btn = styleButtons.find(b => b.dataset.style === style);
+    if (!btn) return;
+
+    styleButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    tshirtStyle = style;
+    updateSizeButtons();
+
+    previewItems.forEach(item => {
+      const isActive = item.dataset.style === style;
+      item.classList.toggle('active', isActive);
+      item.style.display = isActive ? 'block' : 'none';
+      item.style.visibility = isActive ? 'visible' : 'hidden';
+    });
+
+    document.querySelectorAll('.tshirt-badge, .tshirts-form .submit-btn, .tshirts-left h2 span').forEach(el => {
+      el.classList.toggle('true-north-theme', style === 'True North');
+    });
+
+    sizeButtons.forEach(btn => {
+      btn.classList.remove('true-north-theme');
+    });
+
+    const fallbackSize = getFirstAvailableSize(style);
+    if (fallbackSize) setActiveSize(fallbackSize);
+  }
+
   updateSizeButtons();
+  setActiveStyle('True North');
   setActiveSize('L');
 
-  // Size buttons
-  sizeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.disabled) return;
-      setActiveSize(btn.dataset.size);
-    });
+  const tshirtForm = document.querySelector('.tshirts-form');
+  tshirtForm.addEventListener('click', (event) => {
+    const styleBtn = event.target.closest('.style-btn');
+    if (styleBtn) {
+      event.preventDefault();
+      setActiveStyle(styleBtn.dataset.style);
+      return;
+    }
+
+    const sizeBtn = event.target.closest('.size-btn');
+    if (sizeBtn) {
+      event.preventDefault();
+      if (sizeBtn.disabled) return;
+      setActiveSize(sizeBtn.dataset.size);
+    }
   });
 
   // Quantity stepper for tshirts
@@ -1687,15 +1819,15 @@
         buyer_name:  name,
         buyer_email: email,
         product_type: 'T-Shirt',
-        copies:      `${tshirtQty} × Black ELEMENTS T-Shirt (Size ${tshirtSize})`,
+        copies:      `${tshirtQty} × ${tshirtStyle} ELEMENTS T-Shirt (Size ${tshirtSize})`,
         to_email:    'jlr083091@gmail.com',
       });
       console.log('T-shirt order sent');
-      const remainingAfterOrder = Math.max(0, (shirtInventory[tshirtSize] || 0) - tshirtQty);
-      shirtInventory[tshirtSize] = remainingAfterOrder;
+      const remainingAfterOrder = Math.max(0, (shirtInventory[tshirtStyle][tshirtSize] || 0) - tshirtQty);
+      shirtInventory[tshirtStyle][tshirtSize] = remainingAfterOrder;
       updateSizeButtons();
 
-      if (shirtInventory[tshirtSize] > 0) {
+      if (shirtInventory[tshirtStyle][tshirtSize] > 0) {
         setActiveSize(tshirtSize);
       } else {
         const fallback = sizeButtons.find(b => !b.disabled);
@@ -1703,7 +1835,7 @@
       }
 
       document.getElementById('tshirt-form-message').className = 'form-message success';
-      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} shirt(s) in size ${tshirtSize} — confirmation sent to ${email}`;
+      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} ${tshirtStyle} shirt(s) in size ${tshirtSize} — confirmation sent to ${email}`;
       document.getElementById('tshirt-form-message').style.display = 'block';
       document.getElementById('tshirt-name').value  = '';
       document.getElementById('tshirt-email').value = '';
