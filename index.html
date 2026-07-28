@@ -1281,9 +1281,11 @@
 <section class="tshirts-section" id="tshirts">
   <div class="tshirts-left">
     <h2>Order<br>Your <span>T-Shirt</span></h2>
-    <p>Wear your elements. Premium cotton ELEMENTS T-shirt in washed black.</p>
+    <p id="shirt-price-copy">$45 shipped • Full front-and-back print on a heavyweight tee.</p>
     <div class="tshirt-badge">⬭ &nbsp; 100% Cotton</div>
     <div class="tshirt-badge">⬭ &nbsp; Black</div>
+    <div class="tshirt-badge">⬭ &nbsp; Full Front + Back Print</div>
+    <div class="tshirt-badge">⬭ &nbsp; Heavyweight Tee</div>
     
     <div class="tshirt-images" id="shirt-preview-images">
       <div class="shirt-image-wrapper shirt-preview-item" data-style="OG">
@@ -1747,6 +1749,13 @@
     tshirtStyle = style;
     updateSizeButtons();
 
+    const priceCopy = document.getElementById('shirt-price-copy');
+    if (priceCopy) {
+      priceCopy.textContent = style === 'OG'
+        ? '$30 shipped • Elements logo on front, full print on back.'
+        : '$45 shipped • Full front-and-back print on a heavyweight tee.';
+    }
+
     previewItems.forEach(item => {
       const isActive = item.dataset.style === style;
       item.classList.toggle('active', isActive);
@@ -1767,6 +1776,10 @@
   }
 
   updateSizeButtons();
+  const initialPriceCopy = document.getElementById('shirt-price-copy');
+  if (initialPriceCopy) {
+    initialPriceCopy.textContent = '$45 shipped • Full front-and-back print on a heavyweight tee.';
+  }
   setActiveStyle('True North');
   setActiveSize('L');
 
