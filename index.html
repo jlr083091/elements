@@ -1283,8 +1283,8 @@
     <h2>Order<br>Your <span>T-Shirt</span></h2>
     <p id="shirt-price-copy">$45 shipped • Full front-and-back print on a heavyweight tee.</p>
     <div class="tshirt-badge">⬭ &nbsp; 100% Cotton</div>
-    <div class="tshirt-badge">⬭ &nbsp; Black</div>
-    <div class="tshirt-badge">⬭ &nbsp; Full Front + Back Print</div>
+    <div class="tshirt-badge" id="shirt-color-badge">⬭ &nbsp; Washed Grey</div>
+    <div class="tshirt-badge" id="shirt-print-badge">⬭ &nbsp; Full Front + Back Print</div>
     <div class="tshirt-badge">⬭ &nbsp; Heavyweight Tee</div>
     
     <div class="tshirt-images" id="shirt-preview-images">
@@ -1322,7 +1322,6 @@
     <div class="field-group">
       <label class="field-label">Size</label>
       <div class="size-options">
-        <button type="button" class="size-btn" data-size="XS" disabled>XS<br><span>Sold Out</span></button>
         <button type="button" class="size-btn" data-size="S" disabled>S<br><span>Sold Out</span></button>
         <button type="button" class="size-btn" data-size="M" disabled>M<br><span>Sold Out</span></button>
         <button type="button" class="size-btn active" data-size="L">L<br><span>4 Left</span></button>
@@ -1687,8 +1686,8 @@
   let tshirtQty = 1;
   let tshirtStyle = 'True North';
   const shirtInventory = {
-    OG: { XS: 0, S: 0, M: 0, L: 4, XL: 0, '2XL': 0 },
-    'True North': { XS: 0, S: 0, M: 2, L: 4, XL: 3, '2XL': 0 }
+    OG: { S: 0, M: 0, L: 4, XL: 0, '2XL': 0 },
+    'True North': { S: 0, M: 2, L: 4, XL: 3, '2XL': 0 }
   };
   const sizeButtons = Array.from(document.querySelectorAll('.size-btn'));
   const styleButtons = Array.from(document.querySelectorAll('.style-btn'));
@@ -1701,7 +1700,7 @@
       const countLabel = btn.querySelector('span');
 
       if (tshirtStyle === 'True North') {
-        const unavailableSizes = ['XS', 'S', '2XL'];
+        const unavailableSizes = ['S', '2XL'];
         const isUnavailable = unavailableSizes.includes(size);
         btn.classList.toggle('strikethrough', isUnavailable);
         btn.disabled = !isUnavailable ? false : true;
@@ -1722,7 +1721,7 @@
   }
 
   function getFirstAvailableSize(style) {
-    return ['XS', 'S', 'M', 'L', 'XL', '2XL'].find(size => (shirtInventory[style][size] || 0) > 0) || 'L';
+    return ['S', 'M', 'L', 'XL', '2XL'].find(size => (shirtInventory[style][size] || 0) > 0) || 'L';
   }
 
   function setActiveSize(size) {
@@ -1750,10 +1749,18 @@
     updateSizeButtons();
 
     const priceCopy = document.getElementById('shirt-price-copy');
+    const colorBadge = document.getElementById('shirt-color-badge');
+    const printBadge = document.getElementById('shirt-print-badge');
     if (priceCopy) {
       priceCopy.textContent = style === 'OG'
         ? '$30 shipped • Elements logo on front, full print on back.'
         : '$45 shipped • Full front-and-back print on a heavyweight tee.';
+    }
+    if (colorBadge) {
+      colorBadge.textContent = style === 'OG' ? '⬭  Washed Grey' : '⬭  Black';
+    }
+    if (printBadge) {
+      printBadge.textContent = style === 'OG' ? '⬭  Elements Logo Front • Full Back Print' : '⬭  Full Front + Back Print';
     }
 
     previewItems.forEach(item => {
