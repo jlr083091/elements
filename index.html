@@ -1355,7 +1355,7 @@
       </div>
     </div>
 
-    <button type="button" class="submit-btn" id="tshirt-submit-btn">Reserve Now</button>
+    <button type="button" class="submit-btn" id="tshirt-submit-btn">Buy T-Shirt</button>
     <div class="form-message" id="tshirt-form-message"></div>
   </div>
 </section>
@@ -1738,6 +1738,18 @@
       btn.classList.add('true-north-theme');
     }
     tshirtSize = size;
+    updateTshirtButtonLabel();
+  }
+
+  function updateTshirtButtonLabel() {
+    const button = document.getElementById('tshirt-submit-btn');
+    if (!button) return;
+    const unitPrice = tshirtStyle === 'OG' ? 35 : 45;
+    const totalPrice = unitPrice * tshirtQty;
+    const label = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${totalPrice}`;
+    button.textContent = label;
+    const available = (shirtInventory[tshirtStyle] || {})[tshirtSize] || 0;
+    button.disabled = available === 0;
   }
 
   function setActiveStyle(style) {
@@ -1810,49 +1822,21 @@
 
   // Quantity stepper for tshirts
   document.getElementById('tshirt-qty-minus').addEventListener('click', () => {
-    if (tshirtQty > 1) { tshirtQty--; document.getElementById('tshirt-qty-value').value = tshirtQty; }
+    if (tshirtQty > 1) {
+      tshirtQty--;
+      document.getElementById('tshirt-qty-value').value = tshirtQty;
+      updateTshirtButtonLabel();
+    }
   });
   document.getElementById('tshirt-qty-plus').addEventListener('click', () => {
-    if (tshirtQty < 10) { tshirtQty++; document.getElementById('tshirt-qty-value').value = tshirtQty; }
-  });
-
-  // T-shirt form submit
-  document.getElementById('tshirt-submit-btn').addEventListener('click', async () => {
-    const name  = document.getElementById('tshirt-name').value.trim();
-    const email = document.getElementById('tshirt-email').value.trim();
-    const msgEl = document.getElementById('tshirt-form-message');
-    const btn   = document.getElementById('tshirt-submit-btn');
-
-    msgEl.className = 'form-message';
-    msgEl.style.display = 'none';
-
-    if (!name) { showTshirtMsg('error', 'Please enter your name.'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showTshirtMsg('error', 'Please enter a valid email address.'); return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Redirecting...';
-
-    try {
-      const { url } = await createCheckoutSession({
-        productType: 'tshirt',
-        buyerName: name,
-        buyerEmail: email,
-        quantity: tshirtQty,
-        tshirtStyle: tshirtStyle,
-        tshirtSize: tshirtSize,
-      });
-
-      window.location = url;
-    } catch (err) {
-      console.error('Checkout error:', err);
-      showTshirtMsg('error', err.message);
-      btn.disabled = false;
-      btn.textContent = 'Reserve Now';
+    if (tshirtQty < 10) {
+      tshirtQty++;
+      document.getElementById('tshirt-qty-value').value = tshirtQty;
+      updateTshirtButtonLabel();
     }
   });
 
+  updateTshirtButtonLabel();
 </script>
 </body>
 </html>
