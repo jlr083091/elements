@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ELEMENTS — James Ratcliff</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
+<!-- Stripe checkout is handled by the server; vote emails still use EmailJS with public key configuration -->
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1273,6 +1274,11 @@
     </div>
 
     <button class="submit-btn" id="submit-btn">Reserve Now</button>
+    <stripe-buy-button
+      buy-button-id="buy_btn_1U35vNIPZWrPRmDbvOxd4AwQ"
+      publishable-key="pk_test_51U35n9IPZWrPRmDbyA8XMbGO7hpU6h6aikpRcd8oPFjgPlAvgMcDnAJnCsnGcXOPYEurVpG6vF7AraDkegmhKQOA00SIjMw5ix"
+      style="display:block; margin-top:24px;"
+    ></stripe-buy-button>
     <div class="form-message" id="form-message"></div>
   </div>
 </section>
@@ -1427,37 +1433,37 @@
 </div>
 
 <script>
-  // ── EMAILJS SETUP ──
-  // To activate email sending:
-  // 1. Go to https://www.emailjs.com and create a free account
-  // 2. Add an Email Service (Gmail works great) → copy your Service ID
-  // 3. Create THREE Email Templates:
-  //
-  //    TEMPLATE 1 (Pre-Order Vinyl):
-  //    Variables: {{buyer_name}}, {{buyer_email}}, {{product_type}}, {{copies}}, {{to_email}}
-  //    Subject: "New {{product_type}} Order — ELEMENTS"
-  //    Example copies: "2 × 180g Vinyl"
-  //
-  //    TEMPLATE 2 (Vote):
-  //    Variables: {{voter_name}}, {{voter_email}}, {{favorite_track}}, {{to_email}}
-  //    Subject: "New Vote — Favorite Track"
-  //
-  //    TEMPLATE 3 (T-Shirt Order):
-  //    Variables: {{buyer_name}}, {{buyer_email}}, {{product_type}}, {{copies}}, {{to_email}}
-  //    Subject: "New {{product_type}} Order — ELEMENTS"
-  //    Example copies: "2 × Black ELEMENTS T-Shirt (Size L)"
-  //
-  // 4. Copy your Template IDs and Public Key
-  // 5. Replace EMAILJS_TEMPLATE_ID, EMAILJS_VOTE_TEMPLATE, and EMAILJS_TSHIRT_TEMPLATE below
-  // 6. Replace your Service ID and Public Key
-
-  const EMAILJS_PUBLIC_KEY        = 'oBorwBKStAYGmVvVL';
-  const EMAILJS_SERVICE_ID        = 'service_sbu12g9';
-  const EMAILJS_TEMPLATE_ID       = 'template_rvom68r';        // Pre-order vinyl template
-  const EMAILJS_VOTE_TEMPLATE     = 'template_txsfjkh';        // Vote template
-  const EMAILJS_TSHIRT_TEMPLATE   = 'template_rvom68r';        // T-shirt template — replace with your template ID
-
+  // ── STRIPE CHECKOUT SETUP ──
+  const API_BASE = '';
+  const EMAILJS_PUBLIC_KEY = 'oBorwBKStAYGmVvVL';
+  const EMAILJS_SERVICE_ID = 'service_sbu12g9';
+  const EMAILJS_VOTE_TEMPLATE = 'template_txsfjkh';
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+  async function createCheckoutSession(payload) {
+    const response = await fetch(`${API_BASE}/api/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Unable to create Stripe checkout session');
+    }
+    return data;
+  }
+
+  function showQueryMessage() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkoutSuccess')) {
+      showMsg('success', 'Payment complete! Your order is confirmed.');
+    } else if (params.get('checkoutCanceled')) {
+      showMsg('error', 'Checkout canceled. You can try again anytime.');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', showQueryMessage);
 
   // Quantity stepper
   let qty = 1;
@@ -1486,25 +1492,20 @@
     }
 
     btn.disabled = true;
-    btn.textContent = 'Sending...';
+    btn.textContent = 'Redirecting...';
 
     try {
-      const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        buyer_name:  name,
-        buyer_email: email,
-        product_type: 'Vinyl',
-        copies:      copies + ' × 180g Vinyl',
-        to_email:    'jlr083091@gmail.com',
+      const { url } = await createCheckoutSession({
+        productType: 'vinyl',
+        buyerName: name,
+        buyerEmail: email,
+        quantity: copies,
       });
-      console.log('EmailJS success:', result);
-      showMsg('success', `✓ Order received! We'll be in touch at ${email}`);
-      document.getElementById('buyer-name').value  = '';
-      document.getElementById('buyer-email').value = '';
-      qty = 1; qtyDisplay.value = 1;
-      btn.textContent = 'Order Sent ✓';
+
+      window.location = url;
     } catch (err) {
-      console.error('EmailJS error:', err);
-      showMsg('error', `Error: ${err.text || err.message || JSON.stringify(err)}`);
+      console.error('Checkout error:', err);
+      showMsg('error', err.message);
       btn.disabled = false;
       btn.textContent = 'Reserve Now';
     }
@@ -1831,43 +1832,24 @@
     }
 
     btn.disabled = true;
-    btn.textContent = 'Processing...';
+    btn.textContent = 'Redirecting...';
 
     try {
-      // Send tshirt order email
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TSHIRT_TEMPLATE, {
-        buyer_name:  name,
-        buyer_email: email,
-        product_type: 'T-Shirt',
-        copies:      `${tshirtQty} × ${tshirtStyle} ELEMENTS T-Shirt (Size ${tshirtSize})`,
-        to_email:    'jlr083091@gmail.com',
+      const { url } = await createCheckoutSession({
+        productType: 'tshirt',
+        buyerName: name,
+        buyerEmail: email,
+        quantity: tshirtQty,
+        tshirtStyle: tshirtStyle,
+        tshirtSize: tshirtSize,
       });
-      console.log('T-shirt order sent');
-      const remainingAfterOrder = Math.max(0, (shirtInventory[tshirtStyle][tshirtSize] || 0) - tshirtQty);
-      shirtInventory[tshirtStyle][tshirtSize] = remainingAfterOrder;
-      updateSizeButtons();
 
-      if (shirtInventory[tshirtStyle][tshirtSize] > 0) {
-        setActiveSize(tshirtSize);
-      } else {
-        const fallback = sizeButtons.find(b => !b.disabled);
-        if (fallback) setActiveSize(fallback.dataset.size);
-      }
-
-      document.getElementById('tshirt-form-message').className = 'form-message success';
-      document.getElementById('tshirt-form-message').textContent = `✓ Order received! ${tshirtQty} ${tshirtStyle} shirt(s) in size ${tshirtSize} — confirmation sent to ${email}`;
-      document.getElementById('tshirt-form-message').style.display = 'block';
-      document.getElementById('tshirt-name').value  = '';
-      document.getElementById('tshirt-email').value = '';
-      tshirtQty = 1; document.getElementById('tshirt-qty-value').value = 1;
-      btn.textContent = 'Order Sent ✓';
+      window.location = url;
     } catch (err) {
-      console.error('T-shirt order error:', err);
-      document.getElementById('tshirt-form-message').className = 'form-message error';
-      document.getElementById('tshirt-form-message').textContent = `Error: ${err.text || err.message || JSON.stringify(err)}`;
-      document.getElementById('tshirt-form-message').style.display = 'block';
+      console.error('Checkout error:', err);
+      showTshirtMsg('error', err.message);
       btn.disabled = false;
-      btn.textContent = 'Add to Order';
+      btn.textContent = 'Reserve Now';
     }
   });
 

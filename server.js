@@ -1,7 +1,13 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
+const Stripe = require('stripe');
 const SQL = require('sql.js');
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY || '';
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, { apiVersion: '2023-08-16' }) : null;
 
 const rootDir = __dirname;
 const dataDir = path.join(rootDir, 'data');
@@ -37,6 +43,25 @@ function initDb() {
   }
 
   saveDb();
+}
+
+function parseJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      if (!body) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(body));
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
 }
 
 function getCount() {
@@ -80,8 +105,89 @@ function serveFile(res, filePath) {
 
 initDb();
 
+const port = process.env.PORT || 3000;
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  if (req.method === 'GET' && url.pathname === '/config') {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ publishableKey: stripePublishableKey, stripeEnabled: Boolean(stripePublishableKey) }));
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/create-checkout-session') {
+    parseJsonBody(req).then(async (body) => {
+      try {
+        if (!stripe) {
+          throw new Error('Stripe is not configured. Set STRIPE_SECRET_KEY in your environment.');
+        }
+
+        const quantity = Math.max(1, Math.min(10, Number(body.quantity) || 1));
+        let lineItem;
+        let metadata = {
+          buyer_name: body.buyerName || '',
+          buyer_email: body.buyerEmail || '',
+          product_type: body.productType || '',
+        };
+
+        if (body.productType === 'vinyl') {
+          lineItem = {
+            price_data: {
+              currency: 'usd',
+              unit_amount: 3500,
+              product_data: {
+                name: 'ELEMENTS Limited Edition Vinyl',
+                description: '180g limited edition vinyl pre-order',
+              },
+            },
+            quantity,
+          };
+        } else if (body.productType === 'tshirt') {
+          const style = body.tshirtStyle || 'True North';
+          const size = body.tshirtSize || 'L';
+          metadata.tshirt_style = style;
+          metadata.tshirt_size = size;
+          lineItem = {
+            price_data: {
+              currency: 'usd',
+              unit_amount: 4500,
+              product_data: {
+                name: `ELEMENTS T-Shirt (${style}, Size ${size})`,
+                description: `Heavyweight ELEMENTS T-Shirt in ${style} style`,
+              },
+            },
+            quantity,
+          };
+        } else {
+          throw new Error('Invalid product type.');
+        }
+
+              const successUrl = `${process.env.DOMAIN || `http://localhost:${port}`}/?checkoutSuccess=1`;
+        const cancelUrl = `${process.env.DOMAIN || `http://localhost:${port}`}/?checkoutCanceled=1`;
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items: [lineItem],
+          mode: 'payment',
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          customer_email: body.buyerEmail || undefined,
+          metadata,
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ url: session.url }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: err.message || 'Checkout session error' }));
+      }
+    }).catch((err) => {
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: err.message || 'Invalid JSON body' }));
+    });
+    return;
+  }
 
   if (req.method === 'GET' && url.pathname === '/api/play-count') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
