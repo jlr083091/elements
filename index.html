@@ -1905,14 +1905,16 @@
         btn.textContent = 'Opening checkout...';
 
         const checkoutUrl = 'https://buy.stripe.com/test_dRm14o2cPbt97csb6jgQE00';
-        const popup = window.open(checkoutUrl, '_blank', 'popup,width=800,height=800');
+        const newTab = window.open(checkoutUrl, '_blank');
 
-        if (!popup) {
-          showTshirtMsg('error', 'Please allow popups to complete checkout.');
+        if (!newTab) {
+          showTshirtMsg('error', 'Please allow popups or new tabs to complete checkout.');
           btn.disabled = false;
           btn.textContent = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${(tshirtStyle === 'OG' ? 35 : 45) * tshirtQty}`;
           return;
         }
+
+        newTab.focus();
 
         sendTshirtOrderEmail({
           name,
