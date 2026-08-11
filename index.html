@@ -1434,7 +1434,7 @@
   const EMAILJS_PUBLIC_KEY = 'oBorwBKStAYGmVvVL';
   const EMAILJS_SERVICE_ID = 'service_sbu12g9';
   const EMAILJS_VOTE_TEMPLATE = 'template_txsfjkh';
-  const EMAILJS_ORDER_TEMPLATE = 'template_new_order_elements';
+  const EMAILJS_TSHIRT_TEMPLATE = 'template_rvom68r';
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   async function createCheckoutSession(payload) {
@@ -1466,13 +1466,12 @@
 
   async function sendTshirtOrderEmail({ name, email, quantity, style, size }) {
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_ORDER_TEMPLATE, {
-        to_email: 'jlr083091@gmail.com',
-        customer_name: name,
-        customer_email: email,
-        order_items: `${quantity}× ${style} Tee ${size}`,
-        order_type: 'New Order - Elements',
-        message: `New order received for ${quantity}× ${style} Tee ${size}`,
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TSHIRT_TEMPLATE, {
+        buyer_name:  name,
+        buyer_email: email,
+        product_type: 'T-Shirt',
+        copies:      `${quantity} × ${style} ELEMENTS T-Shirt (Size ${size})`,
+        to_email:    'jlr083091@gmail.com',
       });
       return true;
     } catch (error) {
