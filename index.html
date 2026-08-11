@@ -1467,12 +1467,10 @@
     try {
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_VOTE_TEMPLATE, {
         to_email: 'jlr083091@gmail.com',
-        buyer_name: name,
-        buyer_email: email,
-        product: `ELEMENTS T-Shirt (${style}, Size ${size})`,
-        quantity: quantity.toString(),
-        favorite_track: 'T-Shirt order',
-        message: `T-Shirt order received: ${quantity}× ${style} Tee ${size}`,
+        voter_name: name,
+        voter_email: email,
+        favorite_track: `T-Shirt order: ${quantity}× ${style} Tee ${size}`,
+        message: `Order received for ${quantity}× ${style} Tee ${size}`,
       });
       return true;
     } catch (error) {
