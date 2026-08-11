@@ -1442,6 +1442,7 @@
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   async function createCheckoutSession(payload) {
+    console.log('createCheckoutSession payload:', payload);
     const response = await fetch(`${API_BASE}/api/create-checkout-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1449,8 +1450,12 @@
     });
 
     const data = await response.json();
+    console.log('createCheckoutSession response:', response.status, data);
     if (!response.ok) {
-      throw new Error(data.error || 'Unable to create Stripe checkout session');
+      throw new Error(data.error || `Unable to create Stripe checkout session (${response.status})`);
+    }
+    if (!data.url) {
+      throw new Error('Checkout session created but no redirect URL was returned.');
     }
     return data;
   }
