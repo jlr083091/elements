@@ -1434,7 +1434,8 @@
   const EMAILJS_PUBLIC_KEY = 'oBorwBKStAYGmVvVL';
   const EMAILJS_SERVICE_ID = 'service_sbu12g9';
   const EMAILJS_VOTE_TEMPLATE = 'template_txsfjkh';
-  const EMAILJS_TSHIRT_TEMPLATE = 'template_rvom68r';
+  const EMAILJS_TEMPLATE_ID = 'template_rvom68r'; // Pre-order vinyl template
+  const EMAILJS_TSHIRT_TEMPLATE = EMAILJS_TEMPLATE_ID;
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   async function createCheckoutSession(payload) {
@@ -1480,6 +1481,22 @@
     }
   }
 
+  async function sendVinylOrderEmail({ name, email, quantity }) {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        buyer_name:  name,
+        buyer_email: email,
+        product_type: 'Vinyl',
+        copies:      `${quantity} × Limited Edition ELEMENTS Vinyl`,
+        to_email:    'jlr083091@gmail.com',
+      });
+      return true;
+    } catch (error) {
+      console.error('Vinyl reserve email send failed:', error);
+      throw error;
+    }
+  }
+
   function showQueryMessage() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('checkoutSuccess')) {
@@ -1519,20 +1536,25 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Redirecting...';
+      btn.textContent = 'Reserving...';
 
       try {
-        const { url } = await createCheckoutSession({
-          productType: 'vinyl',
-          buyerName: name,
-          buyerEmail: email,
+        await sendVinylOrderEmail({
+          name,
+          email,
           quantity: copies,
         });
 
-        window.location = url;
+        showMsg('success', 'Reserve request sent! I will follow up by email shortly.');
+        document.getElementById('buyer-name').value = '';
+        document.getElementById('buyer-email').value = '';
+        qty = 1;
+        qtyDisplay.value = qty;
+        btn.disabled = false;
+        btn.textContent = 'Reserve Now';
       } catch (err) {
-        console.error('Checkout error:', err);
-        showMsg('error', err.message);
+        console.error('Vinyl reserve error:', err);
+        showMsg('error', 'Unable to send reserve request. Please try again.');
         btn.disabled = false;
         btn.textContent = 'Reserve Now';
       }
@@ -1896,19 +1918,50 @@
         }
 
         btn.disabled = true;
-        btn.textContent = 'Opening checkout...';
+        btn.textContent = 'Checkout opened';
 
         const checkoutUrl = 'https://buy.stripe.com/test_dRm14o2cPbt97csb6jgQE00';
         const newTab = window.open(checkoutUrl, '_blank');
 
+        function resetTshirtButton() {
+          btn.disabled = false;
+          updateTshirtButtonLabel();
+        }
+
+        function cleanupPopupWatchers() {
+          if (popupChecker) {
+            clearInterval(popupChecker);
+            popupChecker = null;
+          }
+          if (popupFocusHandler) {
+            window.removeEventListener('focus', popupFocusHandler);
+            popupFocusHandler = null;
+          }
+        }
+
         if (!newTab) {
           showTshirtMsg('error', 'Please allow popups or new tabs to complete checkout.');
-          btn.disabled = false;
-          btn.textContent = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${(tshirtStyle === 'OG' ? 35 : 45) * tshirtQty}`;
+          resetTshirtButton();
           return;
         }
 
         newTab.focus();
+
+        let popupChecker = setInterval(() => {
+          if (newTab.closed) {
+            cleanupPopupWatchers();
+            resetTshirtButton();
+          }
+        }, 500);
+
+        const popupFocusHandler = () => {
+          if (!newTab || newTab.closed) {
+            cleanupPopupWatchers();
+            resetTshirtButton();
+          }
+        };
+
+        window.addEventListener('focus', popupFocusHandler);
 
         sendTshirtOrderEmail({
           name,
