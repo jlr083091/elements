@@ -1464,96 +1464,103 @@
     }
   }
 
-  window.addEventListener('DOMContentLoaded', showQueryMessage);
+  window.addEventListener('DOMContentLoaded', () => {
+    showQueryMessage();
 
-  // Quantity stepper
-  let qty = 1;
-  const qtyDisplay = document.getElementById('qty-value');
-  document.getElementById('qty-minus').addEventListener('click', () => {
-    if (qty > 1) { qty--; qtyDisplay.value = qty; }
-  });
-  document.getElementById('qty-plus').addEventListener('click', () => {
-    if (qty < 10) { qty++; qtyDisplay.value = qty; }
-  });
+    // Quantity stepper
+    let qty = 1;
+    const qtyDisplay = document.getElementById('qty-value');
+    document.getElementById('qty-minus').addEventListener('click', () => {
+      if (qty > 1) { qty--; qtyDisplay.value = qty; }
+    });
+    document.getElementById('qty-plus').addEventListener('click', () => {
+      if (qty < 10) { qty++; qtyDisplay.value = qty; }
+    });
 
-  // Form submit
-  document.getElementById('submit-btn').addEventListener('click', async () => {
-    const name  = document.getElementById('buyer-name').value.trim();
-    const email = document.getElementById('buyer-email').value.trim();
-    const copies = qtyDisplay.value;
-    const msgEl = document.getElementById('form-message');
-    const btn   = document.getElementById('submit-btn');
+    // Form submit
+    document.getElementById('submit-btn').addEventListener('click', async () => {
+      const name  = document.getElementById('buyer-name').value.trim();
+      const email = document.getElementById('buyer-email').value.trim();
+      const copies = qtyDisplay.value;
+      const msgEl = document.getElementById('form-message');
+      const btn   = document.getElementById('submit-btn');
 
-    msgEl.className = 'form-message';
-    msgEl.style.display = 'none';
+      msgEl.className = 'form-message';
+      msgEl.style.display = 'none';
 
-    if (!name) { showMsg('error', 'Please enter your name.'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showMsg('error', 'Please enter a valid email address.'); return;
+      if (!name) { showMsg('error', 'Please enter your name.'); return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMsg('error', 'Please enter a valid email address.'); return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Redirecting...';
+
+      try {
+        const { url } = await createCheckoutSession({
+          productType: 'vinyl',
+          buyerName: name,
+          buyerEmail: email,
+          quantity: copies,
+        });
+
+        window.location = url;
+      } catch (err) {
+        console.error('Checkout error:', err);
+        showMsg('error', err.message);
+        btn.disabled = false;
+        btn.textContent = 'Reserve Now';
+      }
+    });
+
+    function showMsg(type, text) {
+      const el = document.getElementById('form-message');
+      el.className = `form-message ${type}`;
+      el.textContent = text;
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    btn.disabled = true;
-    btn.textContent = 'Redirecting...';
+    function showTshirtMsg(type, text) {
+      const el = document.getElementById('tshirt-form-message');
+      el.className = `form-message ${type}`;
+      el.textContent = text;
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
+    // ── TRACKLIST ──
+    const tracks = [
+      { name: "Eclipse",  dur: "", color: '--purple' },
+      { name: "Aura",     dur: "", color: '--blue'   },
+      { name: "Pulse",    dur: "", color: '--gold'    },
+      { name: "Terra",    dur: "", color: '--green'  },
+      { name: "Gale",     dur: "", color: '--charcoal'  },
+      { name: "Frost",    dur: "", color: '--white'   },
+      { name: "Inferno",  dur: "", color: '--red'   },
+    ];
+
+    // Load votes from localStorage - single vote system
+    let votes = {};
     try {
-      const { url } = await createCheckoutSession({
-        productType: 'vinyl',
-        buyerName: name,
-        buyerEmail: email,
-        quantity: copies,
-      });
-
-      window.location = url;
+      votes = JSON.parse(localStorage.getItem('trackVotes')) || {};
     } catch (err) {
-      console.error('Checkout error:', err);
-      showMsg('error', err.message);
-      btn.disabled = false;
-      btn.textContent = 'Reserve Now';
+      console.warn('Invalid trackVotes in localStorage, resetting.', err);
+      votes = {};
     }
-  });
+    let currentVote = votes.currentVote || null;
 
-  function showMsg(type, text) {
-    const el = document.getElementById('form-message');
-    el.className = `form-message ${type}`;
-    el.textContent = text;
-    el.style.display = 'block';
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+    // Populate favorite track dropdown
+    const trackSelect = document.getElementById('favorite-track');
+    tracks.forEach(t => {
+      const option = document.createElement('option');
+      option.value = t.name;
+      option.textContent = t.name;
+      trackSelect.appendChild(option);
+    });
 
-  function showTshirtMsg(type, text) {
-    const el = document.getElementById('tshirt-form-message');
-    el.className = `form-message ${type}`;
-    el.textContent = text;
-    el.style.display = 'block';
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  // ── TRACKLIST ──
-  const tracks = [
-    { name: "Eclipse",  dur: "", color: '--purple' },
-    { name: "Aura",     dur: "", color: '--blue'   },
-    { name: "Pulse",    dur: "", color: '--gold'    },
-    { name: "Terra",    dur: "", color: '--green'  },
-    { name: "Gale",     dur: "", color: '--charcoal'  },
-    { name: "Frost",    dur: "", color: '--white'   },
-    { name: "Inferno",  dur: "", color: '--red'   },
-  ];
-
-  // Load votes from localStorage - single vote system
-  let votes = JSON.parse(localStorage.getItem('trackVotes')) || {};
-  let currentVote = votes.currentVote || null;
-
-  // Populate favorite track dropdown
-  const trackSelect = document.getElementById('favorite-track');
-  tracks.forEach(t => {
-    const option = document.createElement('option');
-    option.value = t.name;
-    option.textContent = t.name;
-    trackSelect.appendChild(option);
-  });
-
-  const list = document.getElementById('tracklist');
-  let trackElements = {};
+    const list = document.getElementById('tracklist');
+    let trackElements = {};
 
   tracks.forEach((t, i) => {
     const el = document.createElement('div');
@@ -1705,9 +1712,8 @@
         const unavailableSizes = ['S', '2XL'];
         const isUnavailable = unavailableSizes.includes(size);
         btn.classList.toggle('strikethrough', isUnavailable);
-        btn.disabled = !isUnavailable ? false : true;
-        if (countLabel) countLabel.textContent = isUnavailable ? '' : '';
-        btn.classList.remove('active');
+        btn.disabled = isUnavailable;
+        if (countLabel) countLabel.textContent = isUnavailable ? 'Sold Out' : `${remaining} Left`;
         return;
       }
 
@@ -1717,7 +1723,6 @@
       } else {
         btn.disabled = true;
         if (countLabel) countLabel.textContent = 'Sold Out';
-        btn.classList.remove('active');
       }
     });
   }
@@ -1761,6 +1766,7 @@
     btn.classList.add('active');
     tshirtStyle = style;
     updateSizeButtons();
+    updateTshirtButtonLabel();
 
     const priceCopy = document.getElementById('shirt-price-copy');
     const colorBadge = document.getElementById('shirt-color-badge');
@@ -1796,48 +1802,99 @@
     if (fallbackSize) setActiveSize(fallbackSize);
   }
 
-  updateSizeButtons();
-  const initialPriceCopy = document.getElementById('shirt-price-copy');
-  if (initialPriceCopy) {
-    initialPriceCopy.textContent = '$45 shipped • Full front-and-back print on a heavyweight tee.';
-  }
-  setActiveStyle('True North');
-  setActiveSize('L');
+    updateSizeButtons();
+    const initialPriceCopy = document.getElementById('shirt-price-copy');
+    if (initialPriceCopy) {
+      initialPriceCopy.textContent = '$45 shipped • Full front-and-back print on a heavyweight tee.';
+    }
+    setActiveStyle('True North');
+    setActiveSize('L');
 
-  const tshirtForm = document.querySelector('.tshirts-form');
-  tshirtForm.addEventListener('click', (event) => {
-    const styleBtn = event.target.closest('.style-btn');
-    if (styleBtn) {
-      event.preventDefault();
-      setActiveStyle(styleBtn.dataset.style);
-      return;
+    const tshirtForm = document.querySelector('.tshirts-form');
+    if (tshirtForm) {
+      tshirtForm.addEventListener('click', (event) => {
+        const styleBtn = event.target.closest('.style-btn');
+        if (styleBtn) {
+          event.preventDefault();
+          setActiveStyle(styleBtn.dataset.style);
+          return;
+        }
+
+        const sizeBtn = event.target.closest('.size-btn');
+        if (sizeBtn) {
+          event.preventDefault();
+          if (sizeBtn.disabled) return;
+          setActiveSize(sizeBtn.dataset.size);
+        }
+      });
     }
 
-    const sizeBtn = event.target.closest('.size-btn');
-    if (sizeBtn) {
-      event.preventDefault();
-      if (sizeBtn.disabled) return;
-      setActiveSize(sizeBtn.dataset.size);
+    // Quantity stepper for tshirts
+    const tshirtQtyMinus = document.getElementById('tshirt-qty-minus');
+    const tshirtQtyPlus = document.getElementById('tshirt-qty-plus');
+    const tshirtQtyInput = document.getElementById('tshirt-qty-value');
+
+    if (tshirtQtyMinus) {
+      tshirtQtyMinus.addEventListener('click', () => {
+        if (tshirtQty > 1) {
+          tshirtQty--;
+          if (tshirtQtyInput) tshirtQtyInput.value = tshirtQty;
+          updateTshirtButtonLabel();
+        }
+      });
     }
+
+    if (tshirtQtyPlus) {
+      tshirtQtyPlus.addEventListener('click', () => {
+        if (tshirtQty < 10) {
+          tshirtQty++;
+          if (tshirtQtyInput) tshirtQtyInput.value = tshirtQty;
+          updateTshirtButtonLabel();
+        }
+      });
+    }
+
+    const tshirtSubmitBtn = document.getElementById('tshirt-submit-btn');
+    if (tshirtSubmitBtn) {
+      tshirtSubmitBtn.addEventListener('click', async () => {
+        const name  = document.getElementById('tshirt-name').value.trim();
+        const email = document.getElementById('tshirt-email').value.trim();
+        const msgEl = document.getElementById('tshirt-form-message');
+        const btn   = tshirtSubmitBtn;
+
+        msgEl.className = 'form-message';
+        msgEl.style.display = 'none';
+
+        if (!name) { showTshirtMsg('error', 'Please enter your name.'); return; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showTshirtMsg('error', 'Please enter a valid email address.'); return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Redirecting...';
+
+        try {
+          const { url } = await createCheckoutSession({
+            productType: 'tshirt',
+            buyerName: name,
+            buyerEmail: email,
+            quantity: tshirtQty,
+            tshirtStyle,
+            tshirtSize,
+          });
+
+          window.location = url;
+        } catch (err) {
+          console.error('Checkout error:', err);
+          showTshirtMsg('error', err.message);
+          btn.disabled = false;
+          btn.textContent = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${(tshirtStyle === 'OG' ? 35 : 45) * tshirtQty}`;
+        }
+      });
+    }
+
+    updateTshirtButtonLabel();
   });
-
-  // Quantity stepper for tshirts
-  document.getElementById('tshirt-qty-minus').addEventListener('click', () => {
-    if (tshirtQty > 1) {
-      tshirtQty--;
-      document.getElementById('tshirt-qty-value').value = tshirtQty;
-      updateTshirtButtonLabel();
-    }
-  });
-  document.getElementById('tshirt-qty-plus').addEventListener('click', () => {
-    if (tshirtQty < 10) {
-      tshirtQty++;
-      document.getElementById('tshirt-qty-value').value = tshirtQty;
-      updateTshirtButtonLabel();
-    }
-  });
-
-  updateTshirtButtonLabel();
 </script>
 </body>
 </html>
