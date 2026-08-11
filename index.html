@@ -1468,6 +1468,24 @@
     return data;
   }
 
+  async function sendTshirtOrderEmail({ name, email, quantity, style, size }) {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_VOTE_TEMPLATE, {
+        to_email: 'jlr083091@gmail.com',
+        buyer_name: name,
+        buyer_email: email,
+        product: `ELEMENTS T-Shirt (${style}, Size ${size})`,
+        quantity: quantity.toString(),
+        favorite_track: 'T-Shirt order',
+        message: `T-Shirt order received: ${quantity}× ${style} Tee ${size}`,
+      });
+      return true;
+    } catch (error) {
+      console.error('T-shirt order email send failed:', error);
+      return false;
+    }
+  }
+
   function showQueryMessage() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('checkoutSuccess')) {
@@ -1884,10 +1902,25 @@
         }
 
         btn.disabled = true;
-        btn.textContent = 'Redirecting...';
+        btn.textContent = 'Opening checkout...';
 
         const checkoutUrl = 'https://buy.stripe.com/test_dRm14o2cPbt97csb6jgQE00';
-        window.location.href = checkoutUrl;
+        const popup = window.open(checkoutUrl, '_blank', 'popup,width=800,height=800');
+
+        if (!popup) {
+          showTshirtMsg('error', 'Please allow popups to complete checkout.');
+          btn.disabled = false;
+          btn.textContent = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${(tshirtStyle === 'OG' ? 35 : 45) * tshirtQty}`;
+          return;
+        }
+
+        sendTshirtOrderEmail({
+          name,
+          email,
+          quantity: tshirtQty,
+          style: tshirtStyle,
+          size: tshirtSize,
+        });
       });
     }
 
