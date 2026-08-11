@@ -1449,7 +1449,15 @@
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    let data;
+    const text = await response.text();
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch (err) {
+      console.error('Unable to parse JSON response from checkout session:', text);
+      throw new Error(`Server returned invalid response for checkout session (${response.status})`);
+    }
+
     console.log('createCheckoutSession response:', response.status, data);
     if (!response.ok) {
       throw new Error(data.error || `Unable to create Stripe checkout session (${response.status})`);

@@ -45,6 +45,12 @@ function initDb() {
   saveDb();
 }
 
+function setCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -107,16 +113,37 @@ initDb();
 
 const port = process.env.PORT || 3000;
 
+function respondJson(res, status, payload) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(payload));
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  console.log(`Incoming request: ${req.method} ${url.pathname}`);
 
-  if (req.method === 'GET' && url.pathname === '/config') {
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ publishableKey: stripePublishableKey, stripeEnabled: Boolean(stripePublishableKey) }));
+  setCorsHeaders(res);
+
+  const checkoutPath = '/api/create-checkout-session';
+  const isCheckoutRoute = url.pathname === checkoutPath || url.pathname === `${checkoutPath}/`;
+
+  if (req.method === 'OPTIONS' && isCheckoutRoute) {
+    res.writeHead(204);
+    res.end();
     return;
   }
 
-  if (req.method === 'POST' && url.pathname === '/api/create-checkout-session') {
+  if (req.method === 'GET' && url.pathname === '/config') {
+    respondJson(res, 200, { publishableKey: stripePublishableKey, stripeEnabled: Boolean(stripePublishableKey) });
+    return;
+  }
+
+  if (isCheckoutRoute && req.method !== 'POST') {
+    respondJson(res, 405, { error: 'Method not allowed. Use POST for /api/create-checkout-session.' });
+    return;
+  }
+
+  if (req.method === 'POST' && isCheckoutRoute) {
     parseJsonBody(req).then(async (body) => {
       try {
         if (!stripe) {
@@ -223,7 +250,6 @@ const server = http.createServer((req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
