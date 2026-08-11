@@ -1886,23 +1886,8 @@
         btn.disabled = true;
         btn.textContent = 'Redirecting...';
 
-        try {
-          const { url } = await createCheckoutSession({
-            productType: 'tshirt',
-            buyerName: name,
-            buyerEmail: email,
-            quantity: tshirtQty,
-            tshirtStyle,
-            tshirtSize,
-          });
-
-          window.location = url;
-        } catch (err) {
-          console.error('Checkout error:', err);
-          showTshirtMsg('error', err.message);
-          btn.disabled = false;
-          btn.textContent = `Buy ${tshirtQty}× ${tshirtStyle} Tee ${tshirtSize} — $${(tshirtStyle === 'OG' ? 35 : 45) * tshirtQty}`;
-        }
+        const checkoutUrl = 'https://buy.stripe.com/test_dRm14o2cPbt97csb6jgQE00';
+        window.location.href = checkoutUrl;
       });
     }
 
